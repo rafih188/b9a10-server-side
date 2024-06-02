@@ -3,7 +3,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "mongodb": "^6.6.2"
+    "mongodb": "^6.7.0"
   },
   "name": "b9a10-server-side-rafih-188",
   "version": "1.0.0",
