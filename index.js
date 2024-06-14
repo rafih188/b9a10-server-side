@@ -26,19 +26,28 @@ async function run() {
         // Send a ping to confirm a successful 
         // connection
         const craftCollection = client.db('craftItems').collection('craftCard');
+        const customerDataCollection = client.db('customerReview').collection('customerComment');
 
-      // get operations 
-      app.get('/craft', async (req, res) => {
-        const cursor = craftCollection.find();
-        if((await cursor.count)=== 0){
-            console.log('no data found');
-        }
-        const result = await cursor.toArray();
-        res.send(result);
-    })
+        // get operations 
+        app.get('/craft', async (req, res) => {
+            const cursor = craftCollection.find();
+            if ((await cursor.count) === 0) {
+                console.log('no data found');
+            }
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        app.get('/review', async(req,res)=> {
+            const cursor = customerDataCollection.find();
+            if((await cursor.count)=== 0){
+                console.log('no data found');
+            }
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
 
-        
         // await client.db("admin").command({ ping: 1 });
         // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
