@@ -26,8 +26,29 @@ async function run() {
         // Send a ping to confirm a successful 
         // connection
         const craftCollection = client.db('craftItems').collection('craftCard');
+        
+        const addedCraftList = client.db('craftItems').collection('myCraftList');
+
         const customerDataCollection = client.db('customerReview').collection('customerComment');
 
+        //post operations 
+
+        app.post('/myCraftList', async (req, res) => {
+            const newItem = req.body;
+            const result = await addedCraftList.insertOne(req.body);
+            res.send(result);
+        });
+
+
+        app.post('/craft', async (req, res) => {
+            const result = await craftCollection.insertOne(req.body);
+            res.send(result);
+        });
+
+        app.post('/review', async (req, res) => {
+            const result = await customerDataCollection.insertOne(req.body);
+            res.send(result);
+        });
         // get operations 
         app.get('/craft', async (req, res) => {
             const cursor = craftCollection.find();
@@ -38,9 +59,9 @@ async function run() {
             res.send(result);
         });
 
-        app.get('/review', async(req,res)=> {
+        app.get('/review', async (req, res) => {
             const cursor = customerDataCollection.find();
-            if((await cursor.count)=== 0){
+            if ((await cursor.count) === 0) {
                 console.log('no data found');
             }
             const result = await cursor.toArray();
