@@ -9,7 +9,7 @@ app.use(express.json());
 
 // connection to mongo server 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xfhikw7.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 // !Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -26,10 +26,12 @@ async function run() {
         // Send a ping to confirm a successful 
         // connection
         const craftCollection = client.db('craftItems').collection('craftCard');
-        
-        const addedCraftList = client.db('craftItems').collection('myCraftList');
 
+        const addedCraftList = client.db('craftItems').collection('myCraftList');
+        // customer data 
         const customerDataCollection = client.db('customerReview').collection('customerComment');
+        // artist data 
+        const artistDataCollection = client.db('customerReview').collection('artistdata');
 
         //post operations 
 
@@ -49,7 +51,27 @@ async function run() {
             const result = await customerDataCollection.insertOne(req.body);
             res.send(result);
         });
+
+
         // get operations 
+        //use always small letter for show data root
+        app.get('/mycraftlist', async (req, res) => {
+            const cursor = addedCraftList.find();
+            if ((await cursor.count) === 0) {
+                console.log('no data found');
+            }
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        
+        // get item for update my craft data 
+        app.get('/mycraftlist/:id', async(req,res)=>{
+            const id = req.params.id;
+            const result =await  addedCraftList.findOne({_id: new ObjectId(id)});
+            res.send(result);
+        });
+
         app.get('/craft', async (req, res) => {
             const cursor = craftCollection.find();
             if ((await cursor.count) === 0) {
@@ -65,6 +87,24 @@ async function run() {
                 console.log('no data found');
             }
             const result = await cursor.toArray();
+            res.send(result);
+        });
+        // artist data collection 
+        app.get('/artist', async (req, res) => {
+            const cursor =
+            artistDataCollection.find();
+            if ((await cursor.count) === 0) {
+                console.log('no data found');
+            }
+            const result = await cursor.toArray();
+            res.send(result);
+        });
+
+        // delete operation 
+        app.delete('/mycraftlist/:id', async(req,res)=>{
+            const id = req.params;
+            const query = { _id : new ObjectId(id)};
+            const result = await addedCraftList.deleteOne(query);
             res.send(result);
         })
 
