@@ -35,6 +35,11 @@ async function run() {
 
         const woodenFurniture = client.db('craftItems').collection('woodenFurniture');
 
+
+        //all craft data 
+        const allCraftData = client.db('craftItems').collection('allcraftdata')
+
+
         //post operations 
 
         app.post('/myCraftList', async (req, res) => {
@@ -90,7 +95,7 @@ async function run() {
             const result = await addedCraftList.updateOne(filter, craft, options);
             res.send(result);
         });
-       
+
 
 
         // get item for update my craft data 
@@ -109,14 +114,38 @@ async function run() {
             res.send(result);
         });
         // get wooden furniture 
-        app.get ('/woodenfurniture', async (req,res)=>{
+        app.get('/woodenfurniture', async (req, res) => {
             const cursor = woodenFurniture.find();
             if ((await cursor.count) === 0) {
                 console.log('no data found');
             }
             const result = await cursor.toArray();
             res.send(result);
+        });
+       
+
+
+
+        // get 1 item from all item with spesific id 
+
+        app.get('/allcraftitems', async (req, res) => {
+            const cursor = allCraftData.find()
+            const result = await cursor.toArray();
+            res.send(result);
+
+        });
+
+        
+        app.get('/allcraftitems/:id', async (req,res)=>{
+            const id = req.params.id;
+            const document =await allCraftData.findOne({_id: id});
+            if (!document) {
+                return res.status(404).json({ message: 'Document not found' });
+              };
+            const result= await  res.send(document);
         })
+
+
 
         app.get('/review', async (req, res) => {
             const cursor = customerDataCollection.find();
