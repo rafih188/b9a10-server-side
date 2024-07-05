@@ -33,6 +33,8 @@ async function run() {
         // artist data 
         const artistDataCollection = client.db('customerReview').collection('artistdata');
 
+        const woodenFurniture = client.db('craftItems').collection('woodenFurniture');
+
         //post operations 
 
         app.post('/myCraftList', async (req, res) => {
@@ -63,12 +65,38 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         });
-
-        
-        // get item for update my craft data 
-        app.get('/mycraftlist/:id', async(req,res)=>{
+        // make update of craft items 
+        app.put('/mycraftlist/:id', async (req, res) => {
             const id = req.params.id;
-            const result =await  addedCraftList.findOne({_id: new ObjectId(id)});
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updatedCraft = req.body;
+            const craft = {
+                $set: {
+                    photoUrl: updatedCraft.photoUrl,
+                    itemName: updatedCraft.itemName,
+                    subcategoryName: updatedCraft.subcategoryName,
+                    description: updatedCraft.description,
+                    price: updatedCraft.price,
+                    rating: updatedCraft.rating,
+
+                    customization: updatedCraft.customization,
+                    processingTime: updatedCraft.processingTime,
+                    stockStatus: updatedCraft.stockStatus,
+                    userEmail: updatedCraft.userEmail,
+                    userName: updatedCraft.userName
+                }
+            };
+            const result = await addedCraftList.updateOne(filter, craft, options);
+            res.send(result);
+        });
+       
+
+
+        // get item for update my craft data 
+        app.get('/mycraftlist/:id', async (req, res) => {
+            const id = req.params.id;
+            const result = await addedCraftList.findOne({ _id: new ObjectId(id) });
             res.send(result);
         });
 
@@ -80,6 +108,15 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         });
+        // get wooden furniture 
+        app.get ('/woodenfurniture', async (req,res)=>{
+            const cursor = woodenFurniture.find();
+            if ((await cursor.count) === 0) {
+                console.log('no data found');
+            }
+            const result = await cursor.toArray();
+            res.send(result);
+        })
 
         app.get('/review', async (req, res) => {
             const cursor = customerDataCollection.find();
@@ -92,7 +129,7 @@ async function run() {
         // artist data collection 
         app.get('/artist', async (req, res) => {
             const cursor =
-            artistDataCollection.find();
+                artistDataCollection.find();
             if ((await cursor.count) === 0) {
                 console.log('no data found');
             }
@@ -101,9 +138,9 @@ async function run() {
         });
 
         // delete operation 
-        app.delete('/mycraftlist/:id', async(req,res)=>{
+        app.delete('/mycraftlist/:id', async (req, res) => {
             const id = req.params;
-            const query = { _id : new ObjectId(id)};
+            const query = { _id: new ObjectId(id) };
             const result = await addedCraftList.deleteOne(query);
             res.send(result);
         })
