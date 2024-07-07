@@ -1,8 +1,9 @@
-const express = require('express');
+require('dotenv').config();
 const cors = require('cors');
+const express = require('express');
 const app = express();
 const port = process.env.PORT || 5000;
-require('dotenv').config();
+
 //middware 
 app.use(cors());
 app.use(express.json());
@@ -22,7 +23,7 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
+    
         // Send a ping to confirm a successful 
         // connection
         const craftCollection = client.db('craftItems').collection('craftCard');
@@ -64,9 +65,6 @@ async function run() {
         //use always small letter for show data root
         app.get('/mycraftlist', async (req, res) => {
             const cursor = addedCraftList.find();
-            if ((await cursor.count) === 0) {
-                console.log('no data found');
-            }
             const result = await cursor.toArray();
             res.send(result);
         });
@@ -107,18 +105,13 @@ async function run() {
 
         app.get('/craft', async (req, res) => {
             const cursor = craftCollection.find();
-            if ((await cursor.count) === 0) {
-                console.log('no data found');
-            }
+            
             const result = await cursor.toArray();
             res.send(result);
         });
         // get wooden furniture 
         app.get('/woodenfurniture', async (req, res) => {
             const cursor = woodenFurniture.find();
-            if ((await cursor.count) === 0) {
-                console.log('no data found');
-            }
             const result = await cursor.toArray();
             res.send(result);
         });
@@ -139,29 +132,20 @@ async function run() {
         app.get('/allcraftitems/:id', async (req,res)=>{
             const id = req.params.id;
             const document =await allCraftData.findOne({_id: id});
-            if (!document) {
-                return res.status(404).json({ message: 'Document not found' });
-              };
-            const result= await  res.send(document);
+            const result= res.send(document);
         })
 
 
 
         app.get('/review', async (req, res) => {
             const cursor = customerDataCollection.find();
-            if ((await cursor.count) === 0) {
-                console.log('no data found');
-            }
+            
             const result = await cursor.toArray();
             res.send(result);
         });
         // artist data collection 
         app.get('/artist', async (req, res) => {
-            const cursor =
-                artistDataCollection.find();
-            if ((await cursor.count) === 0) {
-                console.log('no data found');
-            }
+            const cursor = artistDataCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         });
